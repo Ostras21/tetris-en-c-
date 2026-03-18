@@ -1,30 +1,73 @@
-#ifndef PIECE_H
-#define PIECE_H
+#include "piece.h"
+#include <QTextStream>
+#include <cstdlib>
 
-#include <stdint.h>
+Pieza::Pieza(int ancho) {
+    tipoPieza      = rand() % 7;
+    rotacionActual = 0;
+    posX           = (ancho / 2) - 2;
+    posY           = 0;
+    forma          = calcularForma(tipoPieza, rotacionActual);
+}
 
-class Pieza {
-private:
-    uint16_t forma; //unit16 la pieza se representa en una cuadrícula lógica de 4x4 bits, exactamente 16 bits
-    int posX;
-    int posY;
-    int tipoPieza; //no almacenamos las piezas pero necesitamss saber en cual estamos para
-    int rotacionActual; //calcular la siguiente
+Pieza::~Pieza() {}
 
-public:
-    Pieza(int ancho);
-    ~Pieza();
+uint16_t Pieza::getForma()    const { return forma;          }
+int      Pieza::getPosX()     const { return posX;           }
+int      Pieza::getPosY()     const { return posY;           }
+int      Pieza::getTipo()     const { return tipoPieza;      }
+int      Pieza::getRotacion() const { return rotacionActual; }
 
-    void rotar(uint8_t** filasTablero, int ancho, int alto);
-    void moverIzquierda(uint8_t** filasTablero, int ancho, int alto);
-    void moverDerecha(uint8_t** filasTablero, int ancho, int alto);
-    void bajar(uint8_t** filasTablero, int ancho, int alto);
+uint16_t Pieza::calcularForma(int tipo, int rotacion) const {
+    uint16_t base;
+    if      (tipo == 0) base = 0x0F00; // I
+    else if (tipo == 1) base = 0x6600; // O
+    else if (tipo == 2) base = 0x0E40; // T
+    else if (tipo == 3) base = 0x06C0; // S
+    else if (tipo == 4) base = 0x0C60; // Z
+    else if (tipo == 5) base = 0x44C0; // J
+    else                base = 0x4460; // L
 
-    uint16_t getForma()        const;
-    int      getPosX()         const;
-    int      getPosY()         const;
-    int      getTipo()         const;
-    int      getRotacion()     const;
-};
+    uint16_t resultado = base;
+    for (int r = 0; r < rotacion; r++) {
+        uint16_t temporal = 0;
+        for (int fila = 0; fila < 4; fila++) {
+            for (int col = 0; col < 4; col++) {
+                int bitEntrada = 15 - (fila * 4 + col);
+                if ((resultado >> bitEntrada) & 1) {
+                    int bitSalida = 15 - (col * 4 + (3 - fila));
+                    temporal |= (1 << bitSalida);
+                }
+            }
+        }
+        resultado = temporal;
+    }
+    return resultado;
+}
 
-#endif // PIECE_H
+void Pieza::rotar(Tablero& tablero) {
+    int nuevaRotacion = (rotacionActual + 1) % 4;
+    uint16_t nuevaForma = calcularForma(tipoPieza, nuevaRotacion);
+    if (!tablero.hayColision(nuevaForma, posX, posY)) {
+        rotacionActual = nuevaRotacion;
+        forma = nuevaForma;
+    }
+}
+
+void Pieza::moverIzquierda(Tablero& tablero) {
+    if (!tablero.hayColision(forma, posX - 1, posY)) {
+        posX--;
+    }
+}
+
+void Pieza::moverDerecha(Tablero& tablero) {
+    if (!tablero.hayColision(forma, posX + 1, posY)) {
+        posX++;
+    }
+}
+
+void Pieza::bajar(Tablero& tablero) {
+    if (!tablero.hayColision(forma, posX, posY + 1)) {
+        posY++;
+    }
+}
