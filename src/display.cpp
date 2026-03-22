@@ -40,11 +40,6 @@ void Display::imprimirMenu() const {
     salida.flush();
 }
 
-void Display::imprimirPuntuacion(int puntuacion) const {
-    QTextStream salida(stdout);
-    salida << "Puntuacion: " << puntuacion << "\n";
-    salida.flush();
-}
 
 void Display::imprimirGameOver() const {
     QTextStream salida(stdout);

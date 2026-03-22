@@ -34,7 +34,6 @@ Juego::Juego() {
 
     tablero     = new Tablero(ancho, alto);
     piezaActual = new Pieza(ancho);
-    puntuacion  = 0;
     gameOver    = false;
 }
 
@@ -91,13 +90,11 @@ void Juego::procesarTurno() {
         tablero->fijarPieza(piezaActual->getForma(),
                             piezaActual->getPosX(),
                             piezaActual->getPosY());
-        puntuacion += tablero->limpiarFilasCompletas();
+        tablero->limpiarFilasCompletas();
         generarNuevaPieza();
         verificarGameOver();
     }
-
     display.imprimirTablero(*tablero, *piezaActual);
-    display.imprimirPuntuacion(puntuacion);
 
     if (gameOver) display.imprimirGameOver();
 }
