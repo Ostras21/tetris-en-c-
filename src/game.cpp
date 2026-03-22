@@ -1,8 +1,11 @@
 #include "game.h"
 #include "display.h"
 #include <QTextStream>
+#include <ctime>
 
 Juego::Juego() {
+    srand(static_cast<unsigned int>(time(0)));
+
     int ancho = 0;
     int alto  = 0;
 
