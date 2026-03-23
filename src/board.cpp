@@ -4,7 +4,7 @@
 Tablero::Tablero(int w, int h) {
     ancho = w;
     alto = h;
-    bytesPorFila = ancho / 8;
+    bytesPorFila = ancho / 8; //construtor
 
     filas = new uint8_t*[alto];
     for (int i = 0; i < alto; i++) { //se inicia en 0 porqie el tablero esta vacio, de esta forma se evitan colisiones falsas por basura almacenada
